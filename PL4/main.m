@@ -14,6 +14,9 @@ sigma1=std(seriestemp(:,1));
 mu2=mean(seriestemp(:,2));
 sigma2=std(seriestemp(:,2));
 
+x1r=seriestemp(:,1);
+x2r=seriestemp(:,2);
+
 N=size(seriestemp,1);
 
 %Verifica outlines |X1 - Mu|>3*sigma
