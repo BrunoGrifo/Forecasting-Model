@@ -61,4 +61,18 @@ if nout2
          end
      end
 end
+figure(1);
+exe1=detrend(x1ro,'constant');
+x1ro_nova=x1ro-exe1;
+plot((1:48),x1ro,1:48,x1ro_nova);
+
+figure(2);
+exe2=polyfit((1:48)',x1ro,2);
+exe3=polyval(exe2,1:48);
+
+x2ro_nova1=x1ro-exe3';
+plot((1:48),x1ro,1:48,x2ro_nova1,1:48,exe3);
+
+
+
 
