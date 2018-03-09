@@ -1,8 +1,0 @@
-load('seriestemp.dat');
-nan1=find(isnan(seriestemp(:,1)));
-notnan1=find(~isnan(seriestemp(:,1)));
-nan2=find(isnan(seriestemp(:,2)));
-notnan2=find(~isnan(seriestemp(:,2)));
-first=interp1(find(~isnan(seriestemp(:,1))),seriestemp(notnan1,1),nan1);
-second=interp1(find(~isnan(seriestemp(:,2))),seriestemp(notnan2,2),nan1);
-
