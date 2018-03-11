@@ -61,13 +61,15 @@ if nout2
          end
      end
 end
-
-
+%%
+%1.2 & 1.3 & 1.4
 figure(1);
 Serie_Temporal_Sem_Tendencia=detrend(x1ro,'constant');
 x1ro_nova=x1ro-Serie_Temporal_Sem_Tendencia;
 plot((1:48),x1ro,1:48,x1ro_nova);
 
+%%
+%1.5 & 1.6 & 1.7
 figure(2);
 %aproximaçõ linear de grau 2
 Coeficientes_polinomio=polyfit((1:48)',x1ro,2); 
@@ -77,14 +79,14 @@ Aproximacao_Linear_grau2=polyval(Coeficientes_polinomio,1:48);
 x2ro_nova1=x1ro-Aproximacao_Linear_grau2';
 plot((1:48),x1ro,1:48,x2ro_nova1,1:48,Aproximacao_Linear_grau2);
 legend('Serie temporal 1','ST sem tendencia de grau2','Aproximacao_Linear_grau2');
-
-%exercicio 1.8
+%%
+%exercicio 1.8 & 1.9 & 1.10
 %Calcular factores de sazonalidade
 FactoresSazonais=[];
 %figure(3);
 for i=1:24
     factor=(x2ro_nova1(i)+x2ro_nova1(i+24))/2;
-    FactoresSazonais=[FactoresSazonais factor]; 
+    FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais=[FactoresSazonais FactoresSazonais];
 %plot(FactoresSazonais);
@@ -92,6 +94,8 @@ ST_SemFactoresSaz=x1ro-FactoresSazonais';
 figure(4);
 plot(ST_SemFactoresSaz);
 
+%%
+%Resto da ficha
 figure(5);
 Irregularidade=x1ro-Aproximacao_Linear_grau2'-FactoresSazonais';
 plot(Irregularidade);
