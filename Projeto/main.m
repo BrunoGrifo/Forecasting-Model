@@ -18,3 +18,15 @@ values(valuesIndexNan)=interpResultValues;
 %Representação
 figure(1);
 plot(values);
+ylabel("Consumo de Energia total");
+xlabel("Dia");
+title("Consumo de energia diaria");
+
+%Media
+media=mean(values);
+fprintf('Media: %d\n',media);
+
+%Desvio Padrão
+desvio=std(values);
+fprintf('Desvio Padrão: %d\n',desvio);
+
