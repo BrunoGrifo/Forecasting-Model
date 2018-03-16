@@ -1,4 +1,5 @@
 load('seriestemp.dat');
+%%
 nan1=find(isnan(seriestemp(:,1)));
 notnan1=find(~isnan(seriestemp(:,1)));
 nan2=find(isnan(seriestemp(:,2)));

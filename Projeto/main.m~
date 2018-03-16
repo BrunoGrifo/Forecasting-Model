@@ -1,0 +1,10 @@
+%Carregar dados em memoria
+filename='dataset_ATD_PL6.csv';
+file=readtable(filename);
+%Verificar existência de NaN values e guardar cada coluna no seu array
+dates=table2array(file(:,1));
+values=table2array(file(:,2));
+value
+valuesIndexNonNan=find(~isnan(values));
+valuesIndexNan=find(isnan(values));
+interpResultValues=interp1(valuesIndexNonNan,values,valuesIndexNan);
