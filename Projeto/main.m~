@@ -49,9 +49,9 @@ new_values=values;%substituição do outlier
 if N_outliers
      for k=outliers
          if new_values(k)> media
-             new_values(k) = media + 1.5*desvio;
+             new_values(k) = media + 2.5*desvio;
          else
-             new_values = media - 1.5*desvio;
+             new_values = media - 2.5*desvio;
          end
      end
 end
@@ -69,7 +69,7 @@ plot((1:365),new_values,1:365,Tendencia);
 
 figure(4);
 %aproximaçõ linear de grau 2
-Coeficientes_polinomio=polyfit((1:365)',new_values,3); 
+Coeficientes_polinomio=polyfit((1:365)',new_values,4); 
 Aproximacao_Linear_grau4=polyval(Coeficientes_polinomio,(1:365)');
 
 sinal=new_values-Aproximacao_Linear_grau4;
@@ -77,7 +77,7 @@ plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau4);
 
 %Factores de sazonalidade
 FactoresSazonais=[];
-%{
+
 for i=1:31
     if i<=28
         factor=(sinal(i)+sinal(i+31)+sinal(i+31+28)+sinal(i+31+28+31)+sinal(i+31+28+31+30)+sinal(i+31+28+31+30+31)+sinal(i+31+28+31+30+31+30)+sinal(i+31+28+31+30+31+30+31)+sinal(i+31+28+31+30+31+30+31+31)+sinal(i+31+28+31+30+31+30+31+31+30)+sinal(i+31+28+31+30+31+30+31+31+30+31)+sinal(i+31+28+31+30+31+30+31+31+30+31+30))/12;
@@ -92,21 +92,6 @@ for i=1:31
     FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:31) FactoresSazonais(1:28) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31)];
-%}
-
-for i=1:92
-    if i<=90
-        factor=(sinal(i)+sinal(i+90)+sinal(i+90+91)+sinal(i+90+91+92));
-    end
-    if i==91
-        factor=(sinal(i+90)+sinal(i+90+91)+sinal(i+90+91+92));
-    end
-    if i==92
-        factor=(sinal(i+90+91)+sinal(i+90+91+92));
-    end
-    FactoresSazonais=[FactoresSazonais factor]; %#ok<AGROW>
-end
-FactoresSazonais = [FactoresSazonais(1:90) FactoresSazonais(1:91) FactoresSazonais(1:92) FactoresSazonais(1:92)];
 
 Sinal_sem_FactoresSaz=new_values-FactoresSazonais';
 figure(5);
@@ -135,7 +120,7 @@ parcorr(FactoresSazonais');
 
 %3.4
 y1=FactoresSazonais(1:31);
-data = iddata(y1,[],86400);
+%data = iddata(y1,[],86400);
 
 
 
