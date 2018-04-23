@@ -38,7 +38,7 @@ outliers = find(abs(values - MeanMat1)>3*SigmaMat1); % identifica os outliers
 N_outliers=length(outliers);  %numero de outliers
 outliers=[];
 for i=1:N
-    if (abs(values(i) - media) > 2*desvio)
+    if (abs(values(i) - media) > 2.5*desvio)
         %é outlier
         outliers=[outliers, i]; %#ok<AGROW>
     end
@@ -49,9 +49,9 @@ new_values=values;%substituição do outlier
 if N_outliers
      for k=outliers
          if new_values(k)> media
-             new_values(k) = media + 1.5*desvio;
+             new_values(k) = media + 2.2*desvio;
          else
-             new_values = media - 1.5*desvio;
+             new_values = media - 2.2*desvio;
          end
      end
 end
@@ -128,14 +128,16 @@ h = adftest(new_values); % teste de estacionaridade da série regularizada
 
 %3.3
 figure(7);
-autocorr(FactoresSazonais');
+autocorr(FactoresSazonais);
 figure(8);
-parcorr(FactoresSazonais');
+parcorr(FactoresSazonais);
 
 
 %3.4
 y1=FactoresSazonais(1:31);
 data = iddata(y1,[],86400);
 
-
-
+opt1_AR= arOptions('Approach','ls'); %opçoes modelo AR
+nal_AR = 8; %historico da variavel
+model1_AR=ar(data,nal_AR,opt1_AR); %modelo ar
+pcoef1_AR= polydata(model1_AR); %parametros do modelo ar

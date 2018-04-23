@@ -138,9 +138,10 @@ y1_AR2 = repmat (y1_AR,2,1);
 
 %simulação do Modelo AR vom forcast
 y1_ARf= forecast(model1_AR,y1(1:nal_AR),24-nal_AR);
-y1_ARf2=repmat([y1(1:nal_AR); y1_ARf],2,1);
+y1_ARf2=repmat([y1(1:nal_AR); y1_ARf],2,1); % repete a simulação
 
 %Metrica para analise: Comparar o sinal original com 'Modelo AR+tendencia'
+%calculo do erro da simulação
 E1_AR = sum((y1 - y1_AR2(1:24)).^2)
 E1_AR = sum((x1ro - (y1_AR2+Aproximacao_Linear_grau2')).^2)
 E1_AR = sum((x1ro - (y1_AR2+Aproximacao_Linear_grau2'+Irregularidade)).^2)
