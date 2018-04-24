@@ -152,3 +152,23 @@ plot(y1_ARf);
 
 
 
+
+
+Aproximacao_Linear_grau=[];
+T=365;
+for i=1:365
+    result=90*cos((2*pi)/365 * i)+ Tendencia(i);
+    Aproximacao_Linear_grau=[Aproximacao_Linear_grau; result]; %#ok<AGROW>
+end
+sinal=new_values-Aproximacao_Linear_grau;
+plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau);
+
+
+
+
+Coeficientes_polinomio=polyfit((1:365)',new_values,3); 
+Aproximacao_Linear_grau=polyval(Coeficientes_polinomio,(1:365)');
+
+sinal=new_values-Aproximacao_Linear_grau;
+plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau);
+

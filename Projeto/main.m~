@@ -69,16 +69,23 @@ plot((1:365),new_values,1:365,Tendencia);
 
 figure(4);
 %aproximaçõ linear de grau 3
-Coeficientes_polinomio=polyfit((1:365)',new_values,3); 
-Aproximacao_Linear_grau=polyval(Coeficientes_polinomio,(1:365)');
+%Coeficientes_polinomio=polyfit((1:365)',new_values,3); 
+%Aproximacao_Linear_grau3=polyval(Coeficientes_polinomio,(1:365)');
 
+%sinal=new_values-Aproximacao_Linear_grau3;
+%plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau3);
+Aproximacao_Linear_grau=[];
+T=365;
+for i=1:365
+    result=90*cos((2*pi)/365 * i)+ Tendencia(i);
+    Aproximacao_Linear_grau=[Aproximacao_Linear_grau; result]; %#ok<AGROW>
+end
 sinal=new_values-Aproximacao_Linear_grau;
 plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau);
 
-
 %Factores de sazonalidade
 FactoresSazonais=[];
-
+%{
 for i=1:31
     if i<=28
         factor=(sinal(i)+sinal(i+31)+sinal(i+31+28)+sinal(i+31+28+31)+sinal(i+31+28+31+30)+sinal(i+31+28+31+30+31)+sinal(i+31+28+31+30+31+30)+sinal(i+31+28+31+30+31+30+31)+sinal(i+31+28+31+30+31+30+31+31)+sinal(i+31+28+31+30+31+30+31+31+30)+sinal(i+31+28+31+30+31+30+31+31+30+31)+sinal(i+31+28+31+30+31+30+31+31+30+31+30))/12;
@@ -93,7 +100,8 @@ for i=1:31
     FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:31) FactoresSazonais(1:28) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31)];
-%{
+%}
+
 for i=1:92
     if i<=90
         factor=(sinal(i)+sinal(i+90)+sinal(i+90+91)+sinal(i+90+91+92))/4;
@@ -107,7 +115,7 @@ for i=1:92
     FactoresSazonais=[FactoresSazonais factor]; %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:90) FactoresSazonais(1:91) FactoresSazonais(1:92) FactoresSazonais(1:92)];
-%}
+
 Sinal_sem_FactoresSaz=new_values-FactoresSazonais';
 figure(5);
 plot(Sinal_sem_FactoresSaz);
@@ -135,28 +143,10 @@ parcorr(FactoresSazonais);
 
 %3.4
 %%{
-id_y1= iddata(FactoresSazonais',[],1, 'TimeUnit', 'Days');
-
+id_y1= iddata(y1,[],1, 'TimeUnit', 'Mont');
  
 opt1_AR = arOptions('Approach', 'ls');
-na1_AR = 20;  %6
+na1_AR = 8;  %6
 model1_AR = ar(id_y1, na1_AR, opt1_AR);
 pcoef1_AR = polydata(model1_AR);
 %%}
-
-y1_AR = FactoresSazonais(1:na1_AR);
- 
-for k=na1_AR+1:21
-    y1_AR(k) = sum(-pcoef1_AR(2:end)'.*flip(y1_AR(k-na1_AR:k-1)));
-    %Tem que ir buscar os ultimos 6 valores, visto que queremos calcular o
-    %setimo valor
-end
-
-y1_AR2 = repmat(y1_AR,2,1);
-y1_ARf = forecast(model1_AR, FactoresSazonais(1:na1_AR), 24-na1_AR); %Esta funcao tem os novos 18 valores
-%Mas vamos ter que juntar os 6 primeiros a estes 18 novos valores, logo
-y1_ARf = repmat([y1(1:na1_AR);y1_ARf],2,1);
- 
-figure(12)
-plot(t, x1ro_s, '-+', t, y1_AR2, '-o', t, y1_ARf, '-*')
-xlabel('t[h]');
