@@ -79,6 +79,7 @@ plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau);
 %Factores de sazonalidade
 FactoresSazonais=[];
 
+
 for i=1:31
     if i<=28
         factor=(sinal(i)+sinal(i+31)+sinal(i+31+28)+sinal(i+31+28+31)+sinal(i+31+28+31+30)+sinal(i+31+28+31+30+31)+sinal(i+31+28+31+30+31+30)+sinal(i+31+28+31+30+31+30+31)+sinal(i+31+28+31+30+31+30+31+31)+sinal(i+31+28+31+30+31+30+31+31+30)+sinal(i+31+28+31+30+31+30+31+31+30+31)+sinal(i+31+28+31+30+31+30+31+31+30+31+30))/12;
@@ -93,7 +94,9 @@ for i=1:31
     FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:31) FactoresSazonais(1:28) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31)];
+
 %{
+
 for i=1:92
     if i<=90
         factor=(sinal(i)+sinal(i+90)+sinal(i+90+91)+sinal(i+90+91+92))/4;
@@ -107,6 +110,7 @@ for i=1:92
     FactoresSazonais=[FactoresSazonais factor]; %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:90) FactoresSazonais(1:91) FactoresSazonais(1:92) FactoresSazonais(1:92)];
+
 %}
 Sinal_sem_FactoresSaz=new_values-FactoresSazonais';
 figure(5);
@@ -134,29 +138,83 @@ parcorr(FactoresSazonais);
 
 
 %3.4
-%%{
+
 id_y1= iddata(FactoresSazonais',[],1, 'TimeUnit', 'Days');
 
  
 opt1_AR = arOptions('Approach', 'ls');
-na1_AR = 20;  %6
+na1_AR =20;  %6
 model1_AR = ar(id_y1, na1_AR, opt1_AR);
 pcoef1_AR = polydata(model1_AR);
-%%}
 
-y1_AR = FactoresSazonais(1:na1_AR);
+
+y1_AR = FactoresSazonais(1:na1_AR)';
  
-for k=na1_AR+1:21
+for k=na1_AR+1:30
+    disp(y1_AR(k-na1_AR:k-1));
     y1_AR(k) = sum(-pcoef1_AR(2:end)'.*flip(y1_AR(k-na1_AR:k-1)));
     %Tem que ir buscar os ultimos 6 valores, visto que queremos calcular o
     %setimo valor
 end
 
-y1_AR2 = repmat(y1_AR,2,1);
-y1_ARf = forecast(model1_AR, FactoresSazonais(1:na1_AR), 24-na1_AR); %Esta funcao tem os novos 18 valores
+y1_AR2 = repmat(y1_AR,12,1);
+y1_AR2= [y1_AR2; y1_AR2(1:5)];
+y1_ARf = forecast(model1_AR, FactoresSazonais(1:na1_AR)', 30-na1_AR); %Esta funcao tem os novos 18 valores
 %Mas vamos ter que juntar os 6 primeiros a estes 18 novos valores, logo
-y1_ARf = repmat([y1(1:na1_AR);y1_ARf],2,1);
+y1_ARf = repmat([FactoresSazonais(1:na1_AR)';y1_ARf],12,1);
+y1_ARf= [y1_ARf; y1_ARf(1:5)];
+y1_AR2=y1_AR2+Aproximacao_Linear_grau;
+y1_ARf=y1_ARf+Tendencia;
  
 figure(12)
-plot(t, x1ro_s, '-+', t, y1_AR2, '-o', t, y1_ARf, '-*')
+plot(1:365, y1_AR2, '-o', 1:365, y1_ARf, '-*')
 xlabel('t[h]');
+%{ Previsão para Sazonalidade Trimestral
+y1_AR = FactoresSazonais(1:na1_AR)';
+
+%{
+%% 
+for k=na1_AR+1:91
+    disp(y1_AR(k-na1_AR:k-1));
+    y1_AR(k) = sum(-pcoef1_AR(2:end)'.*flip(y1_AR(k-na1_AR:k-1)));
+    %Tem que ir buscar os ultimos 6 valores, visto que queremos calcular o
+    %setimo valor
+end
+
+y1_AR2 = repmat(y1_AR,4,1);
+y1_AR2= [y1_AR2; y1_AR2(1)];
+y1_ARf = forecast(model1_AR, FactoresSazonais(1:na1_AR)', 91-na1_AR); %Esta funcao tem os novos 18 valores
+%Mas vamos ter que juntar os 6 primeiros a estes 18 novos valores, logo
+y1_ARf = repmat([FactoresSazonais(1:na1_AR)';y1_ARf],4,1);
+y1_ARf= [y1_ARf; y1_ARf(1)];
+y1_AR2=y1_AR2+Aproximacao_Linear_grau;
+y1_ARf=y1_ARf+Tendencia;
+ 
+figure(12)
+plot(1:365, y1_AR2, '-o', 1:365, y1_ARf, '-*')
+xlabel('t[h]');
+
+%}
+t=1:365;
+opt1_ARMAX = armaxOptions('SearchMethod', 'auto');
+na1_ARMA = 20;
+nc1_ARMA = 14;
+model1_ARMA = armax(id_y1,[na1_ARMA nc1_ARMA],opt1_ARMAX);
+[pa1_ARMA, pb1_ARMA, pc1_ARMA] = polydata(model1_ARMA);
+ 
+e = randn(30,1);
+y1_ARMA = FactoresSazonais(1:na1_ARMA)';
+ 
+for k=na1_ARMA+1:30
+    y1_ARMA(k) = sum(-pa1_ARMA(2:end)'.*flip(y1_ARMA(k-na1_ARMA:k-1)))+sum(pc1_ARMA'.*flip(e(k-nc1_ARMA:k)));
+end
+ 
+y1_ARMA2 = repmat(y1_ARMA,12,1);
+y1_ARMA2= [y1_ARMA2; y1_ARMA2(1:5)];
+y1_ARMAf = forecast((model1_ARMA),FactoresSazonais(1:na1_ARMA)', 30-na1_ARMA);
+y1_ARMAf2 = repmat([FactoresSazonais(1:na1_ARMA)';y1_ARMAf],12,1);
+y1_ARMAf2= [y1_ARMAf2; y1_ARMAf2(1:5)];
+ 
+figure(14)
+plot(t, y1_ARMA2,'-o', t,y1_ARMAf2,'-*')
+xlabel('t[h]')
