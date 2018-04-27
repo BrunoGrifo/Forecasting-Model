@@ -38,7 +38,7 @@ outliers = find(abs(values - MeanMat1)>3*SigmaMat1); % identifica os outliers
 N_outliers=length(outliers);  %numero de outliers
 outliers=[];
 for i=1:N
-    if (abs(values(i) - media) > 2.5*desvio)
+    if (abs(values(i) - media) > 3*desvio)
         %é outlier
         outliers=[outliers, i]; %#ok<AGROW>
     end
@@ -49,9 +49,9 @@ new_values=values;%substituição do outlier
 if N_outliers
      for k=outliers
          if new_values(k)> media
-             new_values(k) = media + 2.2*desvio;
+             new_values(k) = media + 2.6*desvio;
          else
-             new_values(k) = media - 2.2*desvio;
+             new_values(k) = media - 2.6*desvio;
          end
      end
 end
@@ -164,13 +164,18 @@ y1_ARf = forecast(model1_AR, FactoresSazonais(1:na1_AR)', 30-na1_AR); %Esta func
 y1_ARf = repmat([FactoresSazonais(1:na1_AR)';y1_ARf],12,1);
 y1_ARf= [y1_ARf; y1_ARf(1:5)];
 y1_AR2=y1_AR2+Aproximacao_Linear_grau;
-y1_ARf=y1_ARf+Tendencia;
+y1_ARf=y1_ARf+Aproximacao_Linear_grau;
  
 figure(12)
 plot(1:365, y1_AR2, '-o', 1:365, y1_ARf, '-*')
 xlabel('t[h]');
 %{ Previsão para Sazonalidade Trimestral
 y1_AR = FactoresSazonais(1:na1_AR)';
+
+disp("Erros");
+E1_AR = sum((FactoresSazonais - y1_AR2(1:365)').^2)
+E1_AR1 = sum((new_values - (y1_AR2+Aproximacao_Linear_grau)).^2)
+E1_AR2 = sum((new_values - (y1_AR2+Aproximacao_Linear_grau+Irregularidade)).^2) %
 
 %{
 %% 
@@ -198,7 +203,7 @@ xlabel('t[h]');
 t=1:365;
 opt1_ARMAX = armaxOptions('SearchMethod', 'auto');
 na1_ARMA = 20;
-nc1_ARMA = 14;
+nc1_ARMA = 18;
 model1_ARMA = armax(id_y1,[na1_ARMA nc1_ARMA],opt1_ARMAX);
 [pa1_ARMA, pb1_ARMA, pc1_ARMA] = polydata(model1_ARMA);
  
@@ -214,7 +219,22 @@ y1_ARMA2= [y1_ARMA2; y1_ARMA2(1:5)];
 y1_ARMAf = forecast((model1_ARMA),FactoresSazonais(1:na1_ARMA)', 30-na1_ARMA);
 y1_ARMAf2 = repmat([FactoresSazonais(1:na1_ARMA)';y1_ARMAf],12,1);
 y1_ARMAf2= [y1_ARMAf2; y1_ARMAf2(1:5)];
+y1_ARMA2=y1_ARMA2+Aproximacao_Linear_grau;
+y1_ARMAf2=y1_ARMAf2+Aproximacao_Linear_grau;
  
 figure(14)
 plot(t, y1_ARMA2,'-o', t,y1_ARMAf2,'-*')
 xlabel('t[h]')
+
+%ARIMA
+p1_ARIMA = 20;
+d1_ARIMA =1;
+q1_ARIMA = 3;
+Md1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
+EstMd1 = estimate(Md1, sinal,'Y0', sinal(1:p1_ARIMA+1));
+y1_ARIMA = simulate(EstMd1,365); %faz integracao de modo a aproximar se com a serie original
+y1_ARIMA= y1_ARIMA+Aproximacao_Linear_grau;
+ 
+figure(15);
+plot(t,new_values,'-+', t , y1_ARIMA, '-o');
+xlabel('t[h]'); % resultado nao e melhor
