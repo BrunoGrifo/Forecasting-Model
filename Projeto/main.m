@@ -58,14 +58,21 @@ end
 figure(2)
 subplot(1,2,1)
 plot(values)
+ylabel("Consumo de Energia total");
+xlabel("Dia");
+title("Serie temporal Sem outliers");
 subplot(1,2,2)
 plot(new_values)
+ylabel("Consumo de Energia total");
+xlabel("Dia");
+title("Serie temporal com outliers");
 
 % Materia ficha tp4
 figure(3)
 Serie_Temporal_Sem_Tendencia=detrend(new_values,'constant');
 Tendencia=new_values-Serie_Temporal_Sem_Tendencia;
 plot((1:365),new_values,1:365,Tendencia);
+xlabel('t[n]');
 
 figure(4);
 %aproximaçõ linear de grau 3
@@ -74,11 +81,13 @@ Aproximacao_Linear_grau=polyval(Coeficientes_polinomio,(1:365)');
 
 sinal=new_values-Aproximacao_Linear_grau;
 plot((1:365),new_values,1:365,sinal,1:365,Aproximacao_Linear_grau);
-
+xlabel('t[n]');
+legend({'Sinal Original (sem outliers)','Sinal sem Tendencia (sem outliers)','Tendencia'},'Location','southwest');
+legend('boxoff')
 
 %Factores de sazonalidade
 FactoresSazonais=[];
-
+%{
 
 for i=1:31
     if i<=28
@@ -94,8 +103,8 @@ for i=1:31
     FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:31) FactoresSazonais(1:28) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31)];
+%}
 
-%{
 
 for i=1:92
     if i<=90
@@ -111,17 +120,32 @@ for i=1:92
 end
 FactoresSazonais = [FactoresSazonais(1:90) FactoresSazonais(1:91) FactoresSazonais(1:92) FactoresSazonais(1:92)];
 
-%}
+
 Sinal_sem_FactoresSaz=new_values-FactoresSazonais';
 figure(5);
 plot(Sinal_sem_FactoresSaz);
+xlabel("Dia");
+legend({'Sinal sem componente de sazonal'},'Location','northwest');
+legend('boxoff')
+title("Serie temporal sem Factores de Sazonalidade (Trimestral)");
 
-figure(5);
+
+figure(6);
 Irregularidade=new_values-Aproximacao_Linear_grau-FactoresSazonais';
 plot(Irregularidade);
+xlabel("Dia");
+legend({'Irregularidade'},'Location','southwest');
+legend('boxoff')
+title("Irregularidade do Sinal");
+
 Serie_SemIrregularidade=new_values-Irregularidade;
-figure(6);
+figure(7);
 plot(Serie_SemIrregularidade);
+xlabel("Dia");
+legend({'Sinal sem componente de irregularidade'},'Location','northwest');
+legend('boxoff')
+title("Serie temporal sem Irregularidade");
+
 
 % FICHA 5
 %Tirando as tendencias(primeiro grau ou segundo ou terceiro...) a função
@@ -131,9 +155,9 @@ plot(Serie_SemIrregularidade);
 h = adftest(new_values); % teste de estacionaridade da série regularizada
 
 %3.3
-figure(7);
-autocorr(FactoresSazonais);
 figure(8);
+autocorr(FactoresSazonais);
+figure(9);
 parcorr(FactoresSazonais);
 
 
