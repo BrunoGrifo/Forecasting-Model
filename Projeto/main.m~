@@ -266,28 +266,28 @@ E1_ARMAf = sum((FactoresSazonais - y1_ARMAf2(1:365)').^2)
 E1_ARMAf1 = sum((new_values - (y1_ARMAf2+Aproximacao_Linear_grau)).^2)
 %E1_ARMAf2 = sum((new_values - (y1_ARMAf2+Aproximacao_Linear_grau+Irregularidade)).^2)
 
-%% 
+%%
 %ARIMA
-%y1_ARIMAFinal=zeros(1,365)';
+y1_ARIMAFinal=zeros(1,365)';
 p1_ARIMA = 20;
 d1_ARIMA =1;
-q1_ARIMA = 5;
-    Md1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
+q1_ARIMA = 3;
+    d1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
     EstMd1 = estimate(Md1, sinal,'Y0', sinal(1:p1_ARIMA+1));
     y1_ARIMA = + simulate(EstMd1,365); %faz integracao de modo a aproximar se com a serie original
-for ciclo=1:1
+for ciclo=1:9
     Md1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
     EstMd1 = estimate(Md1, sinal,'Y0', sinal(1:p1_ARIMA+1));
     y1_ARIMA = y1_ARIMA + simulate(EstMd1,365); %faz integracao de modo a aproximar se com a serie original
     %y1_ARIMAFinal=y1_ARIMAFinal+y1_ARIMA;
 end
-y1_ARIMA=y1_ARIMA/2;
+y1_ARIMA=y1_ARIMA/5;
 y1_ARIMA= y1_ARIMA+Aproximacao_Linear_grau;
  
 figure(15);
 plot(t,new_values,'-+', t , y1_ARIMA, '-o');
 ylabel("Consumo de Energia total");
 xlabel("Dia");
-title("Modelo ARIMA - Previsão do consumo de energia");
-legend({'Sinal Original (sem outliers)','Previsão '},'Location','northwest');
+title("Modelo ARMA - Previsão do consumo de energia");
+legend({'repmat','forecast'},'Location','northwest');
 legend('boxoff')
