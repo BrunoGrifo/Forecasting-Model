@@ -88,7 +88,7 @@ legend('boxoff')
 %Factores de sazonalidade
 FactoresSazonais=[];
 
-
+%{
 for i=1:31
     if i<=28
         factor=(sinal(i)+sinal(i+31)+sinal(i+31+28)+sinal(i+31+28+31)+sinal(i+31+28+31+30)+sinal(i+31+28+31+30+31)+sinal(i+31+28+31+30+31+30)+sinal(i+31+28+31+30+31+30+31)+sinal(i+31+28+31+30+31+30+31+31)+sinal(i+31+28+31+30+31+30+31+31+30)+sinal(i+31+28+31+30+31+30+31+31+30+31)+sinal(i+31+28+31+30+31+30+31+31+30+31+30))/12;
@@ -103,9 +103,10 @@ for i=1:31
     FactoresSazonais=[FactoresSazonais factor];  %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:31) FactoresSazonais(1:28) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31) FactoresSazonais(1:30) FactoresSazonais(1:31)];
+%}
 
 
-%{
+
 for i=1:92
     if i<=90
         factor=(sinal(i)+sinal(i+90)+sinal(i+90+91)+sinal(i+90+91+92))/4;
@@ -119,7 +120,6 @@ for i=1:92
     FactoresSazonais=[FactoresSazonais factor]; %#ok<AGROW>
 end
 FactoresSazonais = [FactoresSazonais(1:90) FactoresSazonais(1:91) FactoresSazonais(1:92) FactoresSazonais(1:92)];
-%}
 
 Sinal_sem_FactoresSaz=new_values-FactoresSazonais';
 figure(5);
@@ -271,18 +271,22 @@ E1_ARMAf1 = sum((new_values - (y1_ARMAf2+Aproximacao_Linear_grau)).^2)
 %y1_ARIMAFinal=zeros(1,365)';
 p1_ARIMA = 20;
 d1_ARIMA =1;
-q1_ARIMA = 5;
+q1_ARIMA = 3;
     Md1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
     EstMd1 = estimate(Md1, sinal,'Y0', sinal(1:p1_ARIMA+1));
     y1_ARIMA = + simulate(EstMd1,365); %faz integracao de modo a aproximar se com a serie original
-for ciclo=1:1
+for ciclo=1:9
     Md1 = arima(p1_ARIMA, d1_ARIMA, q1_ARIMA);
     EstMd1 = estimate(Md1, sinal,'Y0', sinal(1:p1_ARIMA+1));
     y1_ARIMA = y1_ARIMA + simulate(EstMd1,365); %faz integracao de modo a aproximar se com a serie original
     %y1_ARIMAFinal=y1_ARIMAFinal+y1_ARIMA;
 end
-y1_ARIMA=y1_ARIMA/2;
+y1_ARIMA=y1_ARIMA/10;
 y1_ARIMA= y1_ARIMA+Aproximacao_Linear_grau;
+arimaerror=0;
+arimaerror = sum((new_values - (y1_ARIMA)).^2)
+
+
  
 figure(15);
 plot(t,new_values,'-+', t , y1_ARIMA, '-o');
